@@ -7,6 +7,35 @@
 
   let language = $langStore || "en";
   let languageList = Constants.strings.versions;
+  // console.log(languageList)
+
+  // Helper function to get the script used in a language
+  function getScript(lang) {
+    return Intl.PluralRules.supportedLocalesOf(lang, { type: "cardinal" })[0];
+  }
+
+  languageList.sort((lang1, lang2) => {
+    if (lang1.name === "English") {
+      return -1; // Keep English at the first position
+    } else if (lang2.name === "English") {
+      return 1; // Move English to a later position
+    } else {
+      const script1 = getScript(lang1.lang);
+      const script2 = getScript(lang2.lang);
+
+      if (script1 === "Arabic" && script2 !== "Arabic") {
+        return 1; // Move Arabic to a later position
+      } else if (script1 !== "Arabic" && script2 === "Arabic") {
+        return -1; // Keep Arabic at the last position
+      } else if (script1 === "Hans" && script2 !== "Hans") {
+        return 1; // Move Chinese to a later position
+      } else if (script1 !== "Hans" && script2 === "Hans") {
+        return -1; // Keep Chinese at the last position
+      } else {
+        return lang1.name.localeCompare(lang2.name); // Sort the remaining languages by name
+      }
+    }
+  });
 
   const languageName = languageList.find(({ lang }) => lang === language).name;
 
